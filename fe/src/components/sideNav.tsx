@@ -1,10 +1,24 @@
-import { useState } from "react"
-import { Trophy} from 'lucide-react'
+import { useEffect, useState } from "react"
+import { Trophy, User} from 'lucide-react'
 import { useNavigate } from "react-router-dom";
+import api from "../lib/axios.js";
 
 export default function SideNav(){
-    const [active, setActive] = useState< 'Summary' | 'Activities'>('Summary');
     const navigate = useNavigate();
+    const [userName, setUserName] = useState<string>("");
+
+    useEffect(() => {
+        async function fetchName() {
+            try {
+                const res = await api.get("/auth/me");
+                setUserName(res.data.user.name);
+            } catch (err) {
+                console.error("Failed to fetch user name", err);
+            }
+        }
+        fetchName();
+    }, []);
+    
     return(
         <nav className="flex flex-col gap-2 w-40 border rounded-l-2xl h-screen py-2">
             <div className="flex items-center gap-2 mt-2">
@@ -16,26 +30,11 @@ export default function SideNav(){
                     Tracking
                 </span>
             </div>
-            <button
-              className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-[1.5rem] font-bold transition-colors ${
-                active === 'Summary'
-                  ? "bg-[#161C27] text-[#E5E9F0]"
-                  : "text-[#6B7684] hover:bg-[#12161F] hover:text-[#9AA3B2]"
-              }`}
-              onClick= { () => setActive('Summary')}
-            >
-                Summary
-            </button>
-            <button
-              className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-[1.5rem] font-bold transition-colors ${
-                active === 'Activities'
-                  ? "bg-[#161C27] text-[#E5E9F0]"
-                  : "text-[#6B7684] hover:bg-[#12161F] hover:text-[#9AA3B2]"
-              }`}
-              onClick= {() => setActive('Activities')}
-            >
-                Activities
-            </button>
+
+            <div className="flex items-center gap-2 mt-2 justify-center">
+                <User/>
+                <span>{userName}</span>
+            </div>
         </nav>
     )
 }
