@@ -1,15 +1,18 @@
 import mongoose from "mongoose";
 
-const TAGS = ["Health", "Study", "Spirit", "Social"];
+export const TAGS = ["health", "study", "spirit", "social"];
 
 const createSchema = new mongoose.Schema(
   {
-    name: {
+    title:{
       type: String,
       required: true,
-      trim: true,
     },
-    tags: {
+    score:{
+      type: Number,
+      required: true,
+    },
+    tags:{
       type: [String],
       enum: TAGS,
       required: true,
@@ -18,14 +21,11 @@ const createSchema = new mongoose.Schema(
         message: "Choose at least 1 tag.",
       },
     },
-    score: {
-      type: Number,
-      required: true,
-    },
+    date: { type: String, required: true },
   },
   { timestamps: true }
 );
 
 const Activity = mongoose.model("Activity", createSchema);
 
-export default Activity;
+export default Activity
