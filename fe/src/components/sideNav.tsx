@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Trophy, User} from 'lucide-react'
 import { useNavigate } from "react-router-dom";
-import api from "../lib/axios.js";
+import api from "../lib/axios";
 
 export default function SideNav(){
     const navigate = useNavigate();

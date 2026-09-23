@@ -1,6 +1,6 @@
 import React from "react";
 import { TAG_META, THEME_STYLES, type Tag } from "./theme";
-import api from '../lib/axios.js'
+import api from '../lib/axios'
 
 interface CardProps {
    _id: string;
@@ -63,7 +63,7 @@ const Card: React.FC<CardProps> = ({ _id, title, score, tags, onDeleteSuccess })
                   >
                     <span className="shrink-0" style={{ color: meta.accent }}>
                       {React.cloneElement(meta.icon as React.ReactElement, {
-                        size: 16,
+                        
                       })}
                     </span>
                     <span className="truncate">{meta.label}</span>

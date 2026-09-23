@@ -1,7 +1,7 @@
 import { PlusCircle } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { TAG_ORDER, TAG_META, type Tag } from "../components/theme";
-import api from '../lib/axios.js'
+import api from '../lib/axios'
 import { useNavigate } from "react-router-dom";
 
 /**
