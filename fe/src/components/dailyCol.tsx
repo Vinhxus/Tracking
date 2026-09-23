@@ -1,19 +1,20 @@
 "use client";
 
-import {Part} from "./part";
+import {DailyPart} from "./part";
 import { Dumbbell, BrainCog, Sun, Users } from "lucide-react";
 import api from '../lib/axios.js';
 import axios from "axios";
 import { type Theme } from './theme.js';
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 type StatType = "health" | "study" | "spirit" | "social";
 
-interface UserStatsData {
-  health: { exp: number; level: number; threshold: number };
-  study: { exp: number; level: number; threshold: number };
-  spirit: { exp: number; level: number; threshold: number };
-  social: { exp: number; level: number; threshold: number };
+interface DailyData {
+  health: { exp: number; };
+  study:  { exp: number; };
+  spirit: { exp: number; };
+  social: { exp: number; };
 }
 
 const PILLARS: { key: StatType; title: string; icon: React.ReactNode; theme: Theme }[] = [
@@ -23,22 +24,27 @@ const PILLARS: { key: StatType; title: string; icon: React.ReactNode; theme: The
   { key: "social", title: "Social", icon: <Users size={14} />, theme: "orange" },
 ];
 
-interface PillarsGridProps {
+interface DailyProps {
   userId: string;
 }
 
-export default function PillarsGrid({ userId }: PillarsGridProps) {
-  const [stats, setStats] = useState<UserStatsData | null>(null);
+export default function DailyCol({ userId }: DailyProps) {
+  const [stats, setStats] = useState<DailyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { date } = useParams(); // undefined nếu route không có :date
 
   useEffect(() => {
     let cancelled = false;
-
     async function fetchStats() {
       try {
         setLoading(true);
-        const res = await api.get(`/`);
+
+        const url = date
+          ? `/daily/${date}`
+          : `/daily`;
+
+        const res = await api.get(url);
         const json = res.data;
 
         if (!json.success) {
@@ -63,7 +69,7 @@ export default function PillarsGrid({ userId }: PillarsGridProps) {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, date]);
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6 text-red-500">Error: {error}</div>;
@@ -72,14 +78,12 @@ export default function PillarsGrid({ userId }: PillarsGridProps) {
   return (
     <div className="flex gap-4 p-6">
       {PILLARS.map((p) => (
-        <Part
+        <DailyPart
           key={p.key}
           icon={p.icon}
           title={p.title}
           theme={p.theme}
           exp={stats[p.key].exp}
-          threshold={stats[p.key].threshold}
-          lvl={stats[p.key].level}
         />
       ))}
     </div>

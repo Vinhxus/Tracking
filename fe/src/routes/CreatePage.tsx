@@ -1,7 +1,8 @@
 import { PlusCircle } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { TAG_ORDER, TAG_META, type Tag } from "../components/theme";
-import { useActivities } from "../components/activityStore";
+import api from '../lib/axios.js'
+import { useNavigate } from "react-router-dom";
 
 /**
  * CreateActivityPage
@@ -16,13 +17,14 @@ import { useActivities } from "../components/activityStore";
  */
 
 export default function CreatePage() {
-  const { addActivity } = useActivities();
+  const navigate = useNavigate();
 
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
   const [score, setScore] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [justCreated, setJustCreated] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   function toggleTag(key: Tag) {
     setTags((prev) =>
@@ -30,11 +32,11 @@ export default function CreatePage() {
     );
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (!name.trim()) {
-      setError("Enter activity's name.");
+    if (!title.trim()) {
+      setError("Enter activity's title.");
       return;
     }
     if (tags.length === 0) {
@@ -46,21 +48,43 @@ export default function CreatePage() {
       return;
     }
 
-    addActivity({ name: name.trim(), tags, score: Number(score) });
+    try {
+      setLoading(true);
+      setError(null);
 
-    // reset form sau khi tạo thành công
-    setName("");
-    setTags([]);
-    setScore("");
-    setError(null);
-    setJustCreated(true);
-    setTimeout(() => setJustCreated(false), 1500);
+      // Đợi server phản hồi
+      const response = await api.post('/create', {
+        title: title.trim(), 
+        tags, 
+        score: Number(score)
+      });
+
+      console.log("Server response:", response.data);
+
+      setTitle("");
+      setTags([]);
+      setScore("");
+      setJustCreated(true);
+      
+      const date = new Date().toISOString().slice(0, 10)
+      setTimeout(() => {
+        setJustCreated(false);
+        navigate(`/activities/${date}`)
+      }, 1500);
+
+    } catch (err: any) {
+      console.error("API error:", err);
+      setError(err.response?.data?.message || "Không thể kết nối đến server.");
+    } finally {
+      setLoading(false);
+    }
+    
   }
 
   return (
     <div className="flex w-screen h-screen items-center justify-center">
       <div className="w-1/2 rounded-2xl border-3 border-white/5 bg-[#0a0f1a] p-6 sm:p-7">
-        <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">
+        <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl ">
           Create new activity
         </h2>
 
@@ -77,8 +101,8 @@ export default function CreatePage() {
             <input
               id="activity-name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="VD: Chạy bộ 30 phút"
               className="w-full rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20"
             />
@@ -87,12 +111,12 @@ export default function CreatePage() {
           {/* Tags */}
           <div>
             <label
-              className="mb-1.5 block text-xs font-semibold text-slate-300"
+              className="mb-1.5 block text-xs font-semibold text-slate-300 "
               style={{ letterSpacing: 0.5 }}
             >
               TAGS
             </label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 ">
               {TAG_ORDER.map((key) => {
                 const meta = TAG_META[key];
                 const active = tags.includes(key);
@@ -101,7 +125,7 @@ export default function CreatePage() {
                     key={key}
                     type="button"
                     onClick={() => toggleTag(key)}
-                    className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition ${
+                    className={`cursor-pointer flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition ${
                       active
                         ? "border-white/20 bg-white/6 text-white"
                         : "border-white/10 bg-white/2 text-slate-400 hover:border-white/20 hover:text-slate-200"
@@ -153,7 +177,7 @@ export default function CreatePage() {
           <div className="flex items-center gap-3 pt-1">
             <button
               type="submit"
-              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-[#06251a] transition hover:bg-emerald-300 active:scale-[0.98]"
+              className="cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-[#06251a] transition hover:bg-emerald-300 active:scale-[0.98]"
             >
               <PlusCircle size={14} />
               Create activity

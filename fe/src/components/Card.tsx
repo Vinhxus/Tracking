@@ -1,91 +1,105 @@
-import { SlidersHorizontal, History } from "lucide-react";
-import { THEME_STYLES, TAG_META, type Theme, type Tag } from "./theme";
-import { useActivities } from "./activityStore";
+import React from "react";
+import { TAG_META, THEME_STYLES, type Tag } from "./theme";
+import api from '../lib/axios.js'
 
-export interface Activity {
-  id: string;
+interface CardProps {
+   _id: string;
   title: string;
-  theme: Theme; // "emerald" | "blue" | "purple" | "orange"
-  points: number;
-  detailLabel: string; // vd: "Rèn thể lực • 45p"
-  tags: Tag[]; // dùng để biết activity thuộc (các) mục nào
+  score: number;
+  tags: (Tag | string)[];
+  onDeleteSuccess: (id: string) => void;
 }
 
-// --- 1 card đơn lẻ (export để dùng lại ở nơi khác, vd. render theo nhóm) ---
-export function TaskCard({
-  title,
-  theme,
-  points,
-  detailLabel,
-  tags,
-}: Activity) {
-  const s = THEME_STYLES[theme];
 
+function normalizeTag(tag: string): Tag | null {
+  const match = (Object.keys(TAG_META) as Tag[]).find(
+    (key) => key.toLowerCase() === tag.toLowerCase()
+  );
+  return match ?? null;
+}
+
+const Card: React.FC<CardProps> = ({ _id, title, score, tags, onDeleteSuccess }) => {
+  const resolvedTags = tags
+    .map((t) => normalizeTag(t))
+    .filter((t): t is Tag => t !== null);
+
+  // Tag đầu tiên quyết định màu chủ đạo của card (viền trái + badge score)
+  const primaryMeta = resolvedTags[0] ? TAG_META[resolvedTags[0]] : null;
+  const primaryStyle = primaryMeta ? THEME_STYLES[primaryMeta.theme] : null;
+  async function handleDelete() {
+    try {
+      const res = await api.delete(`/${_id}`);
+      if (res.data.success) {
+        onDeleteSuccess(_id); // callback truyền từ component cha
+      }
+    } catch (error) {
+      console.error("Lỗi khi xoá activity:", error);
+    }
+  }
   return (
     <div
-      className={`flex min-h-[210px] w-full flex-col justify-between rounded-xl border border-slate-800 border-l-4 ${s.border} bg-[#0d1424] py-4 pl-5 pr-4`}
+      className={[
+        "relative flex items-start gap-4 rounded-2xl h-50 w-80 flex-wrap",
+        "bg-[#12121c] pl-5 pr-4 py-3",
+        "border border-white/5 border-l-4",
+        primaryStyle ? primaryStyle.border : "border-l-slate-500",
+      ].join(" ")}
     >
-      {/* Header: icon + điểm thưởng */}
-      <div className="flex items-start justify-between">
-        <span
-          className={`flex h-9 items-center justify-center rounded-lg px-2.5 text-xs font-bold ${s.iconBg} ${s.iconColor}`}
-        >
-          {points >= 0 ? `+${points}` : points}
-        </span>
-      </div>
+      {/* Title + tags */}
+      <div className="flex flex-col w-full">
+        <div className="flex gap-2 justify-between">
+          <div className="min-w-0 overflow-auto">
+            <h3 className="font-semibold text-white ">
+              {title}
+            </h3>
 
-      {/* Nội dung */}
-      <div className="mt-3">
-        <p className="text-[15px] font-semibold leading-snug text-slate-100">
-          {title}
-        </p>
-
-        {detailLabel && (
-          <p className="mt-2 whitespace-nowrap text-xs leading-relaxed text-slate-500">
-            {detailLabel}
-          </p>
-        )}
-
-        {tags.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-slate-300"
-              >
-                <span
-                  className="h-1.5 w-1.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: TAG_META[tag].accent }}
-                />
-                {TAG_META[tag].label}
-              </span>
-            ))}
+            <div className="mt-1.5 flex min-w-0 gap-3 overflow-hidden">
+              {resolvedTags.map((tag) => {
+                const meta = TAG_META[tag];
+                return (
+                  <span
+                    key={tag}
+                    className="flex min-w-0 shrink-0 items-center gap-1 truncate text-xs font-medium text-slate-400"
+                  >
+                    <span className="shrink-0" style={{ color: meta.accent }}>
+                      {React.cloneElement(meta.icon as React.ReactElement, {
+                        size: 16,
+                      })}
+                    </span>
+                    <span className="truncate">{meta.label}</span>
+                  </span>
+                );
+              })}
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Footer: icon phụ */}
-      <div className="mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 text-slate-600">
-          <SlidersHorizontal size={16} />
-          <History size={16} />
+        {/* Score badge */}
+          <div
+            className={[
+              "shrink-0 rounded-full px-3 py-1 h-max",
+              primaryStyle ? primaryStyle.iconBg : "bg-white/10",
+            ].join(" ")}
+          >
+            <span
+              className={[
+                "text-sm font-bold",
+                primaryStyle ? primaryStyle.percentText : "text-white",
+              ].join(" ")}
+            >
+              {score >= 0 ? "+" : ""}
+              {score}
+            </span>
+          </div>
         </div>
       </div>
+
+      <button 
+        onClick ={handleDelete}
+        className="border rounded-2xl text-red-400 px-2 py-1 items-end cursor-pointer">
+        delete
+      </button>
     </div>
   );
-}
+};
 
-// --- Export default: lưới card, đọc trực tiếp từ ActivityContext ---
-// Không tự giữ state nữa -> mọi activity mới tạo ở CreatePage sẽ tự
-// xuất hiện ở đây vì cả hai cùng đọc/ghi chung 1 context.
-export default function Card() {
-  const { activities } = useActivities();
-
-  return (
-    <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
-      {activities.map((a) => (
-        <TaskCard key={a.id} {...a} />
-      ))}
-    </div>
-  );
-}
+export default Card;

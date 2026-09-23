@@ -19,19 +19,19 @@ export const TAG_META: Record<Tag, TagMeta> = {
     theme: "emerald",
     accent: "#34D399",
     icon: <HeartPulse size={20} />,
-    label: "Sức Khỏe",
+    label: "Health",
   },
   Study: {
     theme: "blue",
     accent: "#38BDF8",
     icon: <Brain size={20} />,
-    label: "Học Tập",
+    label: "Study",
   },
   Spirit: {
     theme: "purple",
     accent: "#A78BFA",
     icon: <Sparkles size={20} />,
-    label: "Tâm Hồn",
+    label: "Spirit",
   },
   Social: {
     theme: "orange",
