@@ -1,0 +1,18 @@
+{
+  "name": "tracking",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Vinhxus/Tracking.git",
+  "author": "Hoang Quoc Vinh <vinh.hoangvinhhochay@hcmut.edu.vn>",
+  "scripts": {
+    "dev:be": "yarn --cwd be run dev",
+    "dev:fe": "yarn --cwd fe run dev",
+    "dev": "concurrently -n BE,FE -c blue,magenta \"yarn run dev:be\" \"yarn run dev:fe\"",
+    "add:all": "yarn --cwd be add && yarn --cwd fe add"
+  },
+
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
