@@ -2,7 +2,7 @@
 
 import {Part} from "./part";
 import { Dumbbell, BrainCog, Sun, Users } from "lucide-react";
-import api from '../lib/axios.js';
+import api from '../lib/axios';
 import axios from "axios";
 import { type Theme } from './theme.js';
 import { useEffect, useState } from "react";

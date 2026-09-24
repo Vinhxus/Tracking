@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../lib/axios.js";
+import api from "../lib/axios";
 import axios from "axios";
 import Card from "./Card";
 

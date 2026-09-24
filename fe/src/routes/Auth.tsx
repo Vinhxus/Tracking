@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from '../lib/axios.js';
+import api from '../lib/axios';
 
 export default function Auth(){
     const navigate = useNavigate();
@@ -92,6 +92,11 @@ export default function Auth(){
                 </nav>
                 <div className=" w-full flex-1 flex flex-col items-center justify-center gap-3 ">
                     <form className="flex flex-col items-center justify-center gap-2" onSubmit={handleSubmit}>
+                        {error && (
+                            <p className="text-red-500">
+                                {error}
+                            </p>
+                        )}
                         <div className="flex flex-col gap-1">
                             <span> mail: </span>
                             <input type="text" placeholder="Username" 
@@ -130,16 +135,12 @@ export default function Auth(){
                             </div>
                         )}
 
-                        { tab === "Sign up" ? (
-                            <button 
-                            type="submit"
-                            className="h-10 w-80 border-2 rounded mt-4 bg-secondary text-white hover:bg-accent cursor-pointer"
-                            >Sign up</button>
-                        ) : <button 
-                        type="submit"
-                        className="h-10 w-80 border-2 rounded mt-4 bg-secondary text-white hover:bg-accent cursor-pointer"
-                        >Sign in</button>
-                    }
+                        {loading
+                            ? "Loading..."
+                            : tab === "Sign up"
+                                ? "Sign up"
+                                : "Sign in"
+                        }
                     </form>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import { PlusCircle } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { TAG_ORDER, TAG_META, type Tag } from "../components/theme";
-import api from '../lib/axios.js'
+import api from '../lib/axios'
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -180,7 +180,7 @@ export default function CreatePage() {
               className="cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-[#06251a] transition hover:bg-emerald-300 active:scale-[0.98]"
             >
               <PlusCircle size={14} />
-              Create activity
+              {loading ? "Creating activity..." : "Create activity"}
             </button>
           </div>
         </form>
