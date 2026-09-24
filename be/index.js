@@ -11,7 +11,14 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://tracking-glif.vercel.app",
+    origin: function (origin, callback) {
+      if (!origin || /^https:\/\/tracking-glif.*\.vercel\.app$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 const PORT = process.env.PORT || 5001;
