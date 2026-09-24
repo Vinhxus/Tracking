@@ -92,11 +92,7 @@ export default function Auth(){
                 </nav>
                 <div className=" w-full flex-1 flex flex-col items-center justify-center gap-3 ">
                     <form className="flex flex-col items-center justify-center gap-2" onSubmit={handleSubmit}>
-                        {error && (
-                            <p className="text-red-500">
-                                {error}
-                            </p>
-                        )}
+                        {error && <span className="text-red-500">{error}</span>}
                         <div className="flex flex-col gap-1">
                             <span> mail: </span>
                             <input type="text" placeholder="Username" 
@@ -134,12 +130,22 @@ export default function Auth(){
                                 />
                             </div>
                         )}
-
                         {loading
                             ? "Loading..."
                             : tab === "Sign up"
-                                ? "Sign up"
-                                : "Sign in"
+                                ? (
+                            <button 
+                                type="submit"
+                                className="h-10 w-80 border-2 rounded mt-4 bg-secondary text-white hover:bg-accent cursor-pointer"
+                            >
+                                Sign up
+                            </button>
+                            ) : <button 
+                            type="submit"
+                            className="h-10 w-80 border-2 rounded mt-4 bg-secondary text-white hover:bg-accent cursor-pointer"
+                            >
+                                Sign in
+                            </button>
                         }
                     </form>
                 </div>
