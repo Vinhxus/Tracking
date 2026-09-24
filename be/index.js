@@ -11,7 +11,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://tracking-glif.vercel.app",
   })
 );
 const PORT = process.env.PORT || 5001;
