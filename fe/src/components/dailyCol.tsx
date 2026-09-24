@@ -83,7 +83,7 @@ export default function DailyCol({ userId }: DailyProps) {
           icon={p.icon}
           title={p.title}
           theme={p.theme}
-          exp={stats[p.key].exp}
+          exp={stats[p.key]?.exp ?? 0}
         />
       ))}
     </div>

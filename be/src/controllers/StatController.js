@@ -50,9 +50,17 @@ export async function getDailyStats(req, res) {
   try {
     const date = req.params.date || new Date().toISOString().slice(0, 10);
     const daily = await DailyStat.findOne({ userId: req.userId, date });
+
+    const defaultStats = {
+      health: { exp: 0 },
+      study: { exp: 0 },
+      spirit: { exp: 0 },
+      social: { exp: 0 },
+    };
+
     res.status(200).json({
       success: true,
-      data: daily ?? { userId: req.userId, date }
+      data: daily ?? { userId: req.userId, date, ...defaultStats }
     });
   } catch (error) {
     console.error("error in getDailyStats", error);
