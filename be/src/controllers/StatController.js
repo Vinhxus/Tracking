@@ -1,6 +1,5 @@
 import UserStats from "../models/statModel.js";
 import DailyStat from "../models/dailyModel.js";
-import { toDateStr } from "../utils/dateUtils.js";
 
 export const addExpToStat = async (req, res) => {
   try {
