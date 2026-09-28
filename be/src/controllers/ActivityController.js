@@ -30,7 +30,8 @@ export async function CreateNewActivity(req,res){
         const dateStr = date || toDateStr(new Date());
 
         const lowercaseTags = tagsArray.map(tag => tag.toLowerCase());
-        const activity = await Activity.create({title, category, time, tags: lowercaseTags, date:dateStr});
+        const lowerCategory = category.map( a => a.toLowerCase());
+        const activity = await Activity.create({title, category: lowerCategory, time, tags: lowercaseTags, date:dateStr});
         const userStats = await UserStats.getOrCreate(req.userId); // assuming req.user.id contains the user's ID
 
         // 3. Lặp qua các tags của activity và cộng exp tương ứng

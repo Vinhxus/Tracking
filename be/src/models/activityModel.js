@@ -3,14 +3,26 @@ import mongoose from "mongoose";
 export const TAGS = ["health", "study", "spirit", "social"];
 export const Category = ["hard", "medium", "light"];
 
+function getScore(category, time) {
+  switch (String(category).toLowerCase()) {
+    case "hard":
+      return time * 3;
+    case "medium":
+      return time * 2;
+    default:
+      return time;
+  }
+}
+
 const createSchema = new mongoose.Schema(
   {
     title:{
       type: String,
       required: true,
     },
-    category:{
-      type: [String],
+    category: {
+      type: String,
+      enum: Category,
       required: true,
     },
     time:{
@@ -33,18 +45,15 @@ const createSchema = new mongoose.Schema(
     },
     date: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+  }
 );
 
-function getScore(category, time){
-  if (category === "hard") {
-    return time * 3;
-  } else if (category === "medium") {
-    return time * 2;
-  } else {
-    return time;
-  }
-};
+createSchema.virtual("score").get(function () {
+  return getScore(this.category, this.time);
+});
 
 const Activity = mongoose.model("Activity", createSchema);
 
