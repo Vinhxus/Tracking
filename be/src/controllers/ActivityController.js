@@ -6,7 +6,7 @@ import { toDateStr } from "../utils/dateUtils.js";
 export async function CreateNewActivity(req,res){
     try{
         console.log("RAW BODY:", req.body);
-        const {title, score, tags, date} = req.body;
+        const {title, category, time, tags, date} = req.body;
           // Normalize tags into an array of lowercase strings
         let tagsArray = tags;
         if (!tagsArray) {
@@ -19,18 +19,25 @@ export async function CreateNewActivity(req,res){
             return res.status(400).json({ success: false, message: "tags is required and must be a non-empty array" });
         }
 
+        if (!title || !category || !time) {
+            return res.status(400).json({ success: false, message: "title, category, and time are required" });
+        }
+
+        if (!Array.isArray(category) || category.length === 0) {
+            return res.status(400).json({ success: false, message: "category is required and must be a non-empty array" });
+        }     
          // nếu client không truyền date -> mặc định hôm nay (giờ VN)
         const dateStr = date || toDateStr(new Date());
 
         const lowercaseTags = tagsArray.map(tag => tag.toLowerCase());
-        const activity = await Activity.create({title, score, tags: lowercaseTags, date:dateStr});
+        const activity = await Activity.create({title, category, time, tags: lowercaseTags, date:dateStr});
         const userStats = await UserStats.getOrCreate(req.userId); // assuming req.user.id contains the user's ID
 
         // 3. Lặp qua các tags của activity và cộng exp tương ứng
         // Dùng vòng lặp for...of để đảm bảo hàm gainExp chạy tuần tự 
         // vì bên trong gainExp có gọi await this.save()
         for (const tag of lowercaseTags) {
-            await userStats.gainExp(tag, score, dateStr);
+            await userStats.gainExp(tag, activity.score, dateStr);
         }
 
         res.status(201).json({ 

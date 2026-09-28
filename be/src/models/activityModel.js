@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 export const TAGS = ["health", "study", "spirit", "social"];
+export const Category = ["hard", "medium", "light"];
 
 const createSchema = new mongoose.Schema(
   {
@@ -8,9 +9,18 @@ const createSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    score:{
+    category:{
+      type: [String],
+      required: true,
+    },
+    time:{
       type: Number,
       required: true,
+    },
+    score:{
+      get: function() {
+        return getScore(this.category, this.time);
+      }
     },
     tags:{
       type: [String],
@@ -25,6 +35,16 @@ const createSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+function getScore(category, time){
+  if (category === "hard") {
+    return time * 3;
+  } else if (category === "medium") {
+    return time * 2;
+  } else {
+    return time;
+  }
+};
 
 const Activity = mongoose.model("Activity", createSchema);
 
