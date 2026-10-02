@@ -16,6 +16,7 @@ export async function CreateNewActivity(req,res){
         }
 
         if (tagsArray.length === 0) {
+            console.log("Invalid tags:", tagsArray);
             return res.status(400).json({ success: false, message: "tags is required and must be a non-empty array" });
         }
 
