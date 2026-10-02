@@ -15,17 +15,13 @@ import { useNavigate } from "react-router-dom";
  * Khi submit hợp lệ, activity mới sẽ được thêm vào ActivityContext,
  * và tự động xuất hiện ở lưới Card (Card.tsx) vì cả 2 dùng chung context.
  */
-type Category = "Hard" | "Medium" | "Light";
-
-const CATEGORIES: Category[] = ["Hard", "Medium", "Light"];
 
 export default function CreatePage() {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
-  const [time, setTime] = useState<number>(0);
-  const [category, setCategory] = useState<"Hard" | "Medium" | "Light">("Medium");
+  const [score, setScore] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [justCreated, setJustCreated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,8 +43,8 @@ export default function CreatePage() {
       setError("Choose at least 1 tag.");
       return;
     }
-    if (time === 0) {
-      setError("Give a valid time.");
+    if (score.trim() === "" || Number.isNaN(Number(score))) {
+      setError("Give a valid score.");
       return;
     }
 
@@ -60,15 +56,14 @@ export default function CreatePage() {
       const response = await api.post('/create', {
         title: title.trim(), 
         tags, 
-        time: Number(time),
-        category
+        score: Number(score)
       });
 
       console.log("Server response:", response.data);
 
       setTitle("");
       setTags([]);
-      setTime(0);
+      setScore("");
       setJustCreated(true);
       
       const date = new Date().toISOString().slice(0, 10)
@@ -148,45 +143,22 @@ export default function CreatePage() {
           </div>
 
           {/* Score */}
-          <div className="flex gap-4">
-            <div>
-              <label
-                htmlFor="activity-category"
-                className="mb-1.5 block text-xs font-semibold text-slate-300"
-                style={{ letterSpacing: 0.5 }}
-              >
-                Category
-              </label>
-              <select
-                id="activity-category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as Category)}
-                className="w-full rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20"
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c} className="bg-slate-900 text-white">
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="activity-time"
-                className="mb-1.5 block text-xs font-semibold text-slate-300"
-                style={{ letterSpacing: 0.5 }}
-              >
-                Time
-              </label>
-              <input
-                id="activity-time"
-                type="number"
-                value={time}
-                onChange={(e) => setTime(Number(e.target.value))}
-                placeholder="VD: 10 hoặc -5"
-                className="w-full rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20"
-              />
-            </div>
+          <div>
+            <label
+              htmlFor="activity-score"
+              className="mb-1.5 block text-xs font-semibold text-slate-300"
+              style={{ letterSpacing: 0.5 }}
+            >
+              SCORE
+            </label>
+            <input
+              id="activity-score"
+              type="number"
+              value={score}
+              onChange={(e) => setScore(e.target.value)}
+              placeholder="VD: 10 hoặc -5"
+              className="w-full rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-400/20"
+            />
           </div>
 
           {error && (
