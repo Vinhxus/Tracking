@@ -15,7 +15,7 @@ export default function RankProgress({
   const formatNumber = (n: number) => n.toLocaleString("vi-VN");
 
   return (
-    <div className="w-full max-w-xl rounded-2xl bg-linear-to-br from-[#0c1220] to-[#131b2e] px-6 py-5 shadow-lg">
+    <div className="progress w-full max-w-xl rounded-2xl bg-linear-to-br from-[#0c1220] to-[#131b2e] px-6 py-5 shadow-lg">
       {/* Top row */}
       <div className="mb-3.5 flex items-baseline justify-between">
         <span className="text-xs font-bold tracking-widest text-emerald-300">
