@@ -77,7 +77,7 @@ export default function PillarsGrid({ userId }: PillarsGridProps) {
           icon={p.icon}
           title={p.title}
           theme={p.theme}
-          exp={stats[p.key].exp}
+          exp={stats[p.key]?.exp ?? 0}
           threshold={stats[p.key].threshold}
           lvl={stats[p.key].level}
         />

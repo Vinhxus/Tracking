@@ -73,7 +73,7 @@ export default function Auth(){
 
     return (
         <div data-theme="night" className =" w-screen h-screen flex items-center justify-center">
-            <div className="auth h-120 w-160 border-2 flex flex-col items-center rounded-2xl gap-3">
+            <div className="h-120 w-160 border-2 flex flex-col items-center rounded-2xl gap-3">
                 <nav className="h-max w-max px-2 py-1 border-2 rounded flex justify-center mt-5 ml-2">
                     <button 
                         type="button"
